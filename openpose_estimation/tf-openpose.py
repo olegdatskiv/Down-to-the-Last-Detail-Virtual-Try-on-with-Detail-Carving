@@ -27,6 +27,17 @@ def write_coco_json(human, image_w, image_h):
             continue
         body_part = human.body_parts[coco_id]
         keypoints.extend([body_part.x * image_w, body_part.y * image_h, body_part.score])
+    keypoints.extend([0, 0, 0])
+    return keypoints
+
+def write_coco_json_2(human, image_w, image_h):
+    keypoints = []
+    for coco_id in range(common.CocoPart.Background.value):
+        if coco_id not in human.body_parts.keys():
+            keypoints.extend([0, 0, 0])
+            continue
+        body_part = human.body_parts[coco_id]
+        keypoints.extend([body_part.x * image_w, body_part.y * image_h, body_part.score])
     return keypoints
 
 
@@ -66,7 +77,7 @@ def base_test():
 
 
 def save_to_file():
-    model = 'mobilenet_thin'
+    model = 'mobilenet_v2_large'
     resize = '432x368'
     w, h = model_wh(resize)
 
@@ -82,7 +93,7 @@ def save_to_file():
     annotation["version"] = 1.3
     annotation["people"] = []
     for human in humans:
-        res = write_coco_json(human, image.shape[0], image.shape[1])
+        res = write_coco_json_2(human, image.shape[0], image.shape[1])
         human_annotation = dict()
         human_annotation['person_id'] = [-1]
         human_annotation['pose_keypoints_2d'] = res
@@ -95,7 +106,7 @@ def save_to_file():
         human_annotation['hand_right_keypoints_3d'] = []
         annotation["people"].append(human_annotation)
 
-    with open('{}.json'.format(image_path.split('.')[0]), 'w') as fp:
+    with open('{}_keypoints.json'.format(image_path.split('.')[0]), 'w') as fp:
         json.dump(annotation, fp)
 
 

@@ -5,6 +5,9 @@ import gluoncv
 from gluoncv.data.transforms.presets.segmentation import test_transform
 from gluoncv.utils.viz import get_color_pallete
 import matplotlib.image as mpimg
+import numpy as np
+from PIL import Image, ImageOps
+import cv2
 
 from matplotlib import pyplot as plt
 
@@ -41,11 +44,18 @@ def graphology(path_to_img, ctx):
     output = model.predict(img)
     predict = mx.nd.squeeze(mx.nd.argmax(output, 1)).asnumpy()
 
-    mask = get_color_pallete(predict, 'mhpv1')
-    mask.save('{}.png'.format(path_to_img.split('.')[0]))
+    mask = get_color_pallete(predict, 'pascal_voc')
+    greyscale_img = ImageOps.grayscale(mask)
+    print(np.shape(greyscale_img))
+    greyscale_img.save('{}.png'.format(path_to_img.split('.')[0]))
+    rgb_im = mask.convert('RGB')
+    # rgb_im = cv2.cvtColor(np.asarray(rgb_im), cv2.COLOR_RGB2BGR)
+    print(np.shape(rgb_im))
+    # cv2.imwrite('{}_vis.png'.format(path_to_img.split('.')[0]), rgb_im)
+    rgb_im.save('{}_vis_1.png'.format(path_to_img.split('.')[0]))
 
 
 if __name__ == "__main__":
     # using cpu
     ctx = mx.cpu(0)
-    graphology('JZ20-R-TRU5400-012-1-03.jpg', ctx)
+    graphology('test3.jpg', ctx)

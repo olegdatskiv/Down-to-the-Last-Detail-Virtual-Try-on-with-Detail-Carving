@@ -101,7 +101,7 @@ def forward(opt, paths, gpu_ids, refine_path):
                     num_workers=opt.num_workers,
                     batch_size = opt.batch_size_v,
                     pin_memory=True)
-    
+
     with torch.no_grad():
         for i, result in enumerate(val_dataloader):
             'warped cloth'
